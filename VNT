@@ -105,7 +105,7 @@ end
                     v.Handle.Massless = true
                     v.Handle.Transparency = 1
                     a.Adornee = v.Handle
-                    v.Handle.Size = Vector3.new(15, 15, 20)
+                    v.Handle.Size = Vector3.new(15, 15, 15)
                     local selectionBox = Instance.new("SelectionBox",v.Handle)
                     selectionBox.Adornee = v.Handle
                     selectionBox.Color3 = Color3.new(0, 0.313725, 0.47451)
