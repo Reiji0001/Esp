@@ -1,7 +1,6 @@
-print('VN SCRIPT LOADED!')
-   local allowedUsers = {
+local allowedUsers = {
     ["b123vnoo"] = true,
-    ["clone"] = true
+    ["phubentau"] = true
 }
 local currentUserName = game.Players.LocalPlayer.Name
 
@@ -13,6 +12,7 @@ if not allowedUsers[currentUserName] then
     })
     return
 end
+print('VN SCRIPT LOADED!')
 if workspace:FindFirstChild("Antifly") then
     for i,v in pairs(workspace.Antifly:GetChildren()) do
        if v:FindFirstChild('TouchInterest') or v:FindFirstChildOfClass("TouchTransmitter") then
@@ -104,7 +104,6 @@ Toggle:OnChanged(function(Value)
     AutoBuyBangGac = Value
 end)
 
-
 Tabs.Main:AddButton({
     Title = "Hit Box",
     Description = "",
@@ -130,7 +129,7 @@ Tabs.Main:AddButton({
                             v.Handle.Massless = true
                             v.Handle.Transparency = 1
                             a.Adornee = v.Handle
-                            v.Handle.Size = Vector3.new(9, 9 , 9)
+                            v.Handle.Size = Vector3.new(15, 25 , 2)
                             local selectionBox = Instance.new("SelectionBox",v.Handle)
                             selectionBox.Adornee = v.Handle
                             selectionBox.Color3 = Color3.new(0, 0.313725, 0.47451)
@@ -154,7 +153,7 @@ Tabs.Main:AddButton({
                     })
                     for i,v in pairs(game:GetService'Players'.LocalPlayer.Character:GetChildren()) do
                         if v:isA("Tool") then
-                            v.Handle.Size = Vector3.new(9, 9 , 9)
+                            v.Handle.Size = Vector3.new(15, 30 , 2)
                         end
                     end
                 end
@@ -187,6 +186,13 @@ Tabs.Main:AddButton({
         }
 
 
+        Window:Dialog({
+            Title = "Select Weapon",
+            Content = "Chọn một vũ khí:",
+            Buttons = weaponButtons
+        })
+    end
+})
 
 local Toggle = Tabs.Main:AddToggle("AutoBangGac", {Title = "Auto Bang Gac", Default = AutoBangGacFrs })
 
@@ -245,7 +251,7 @@ end
 function UnInventoryWeapon(WE)
     if CheckItem(WE) then
     local args = {
-        [1] = "eue",    
+        [1] = "eue",
         [2] = WE
     }
     
@@ -258,7 +264,7 @@ spawn(function()
         if DisableALLautogiangho then
             break
         end
-        if AutoFarmGiangho and not DisableALLautogiangho and (Vector3.new(871, 29, -1423) - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 10000 then
+        if AutoFarmGiangho and not DisableALLautogiangho and (Vector3.new(871, 29, -1423) - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 5000 then
             for i,v in pairs(workspace.GiangHo.NPCs:GetChildren()) do
                if v:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('Humanoid') and v.Humanoid.Health > 0 then
                   repeat wait() 
