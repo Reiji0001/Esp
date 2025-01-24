@@ -327,3 +327,4 @@ venyx:SelectPage(venyx.pages[1], true)
         Text = "Nếu Bạn Sử Dụng Script Này Bọn Kia Tuổi Lồn Sánh Vai";
         Duration = 5;
     })
+end)
