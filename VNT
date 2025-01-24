@@ -53,7 +53,7 @@ end
         end
     )
     w1:Button(
-        "Reach",
+        "Boi",
         function()
             local sound = Instance.new("Sound")
             sound.SoundId = "rbxassetid://413861777"
@@ -314,8 +314,12 @@ section1:addToggle("doi mau", nil, function(value)
         end)
     end)
 end)
-
--- load
+section1:addKeybind("Toggle Keybind", Enum.KeyCode.LeftAlt, function()
+print("Activated Keybind")
+venyx:toggle()
+end, function()
+print("Changed Keybind")
+end)
 venyx:SelectPage(venyx.pages[1], true)
     game.StarterGui:SetCore("SendNotification", {
         Title = "Made By Reiji";
