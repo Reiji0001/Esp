@@ -156,19 +156,17 @@ end
         end
     )
     w1:Label("Made By Reiji")
-   local w1 = library:Window("VNT Script - 2")
-       w1:Button('Đóng Menu', function()
-    for i,v in pairs(game.CoreGui:GetChildren()) do
-        if v:FindFirstChild('Top') then
-            v:Destroy()    
+local w1 = library:Window("VNT Script - 2")
+
+w1:Button("Đóng Menu", function()
+    for i, v in pairs(game.CoreGui:GetChildren()) do
+        if v:FindFirstChild("Top") then
+            v:Destroy()
         end
     end
 end)
 
-    w1:Button(
-        "Xoá line Hitbox",
-        function()
-Callback = function()
+w1:Button("Xoá line Hitbox", function()
     local sound = Instance.new("Sound")
     sound.SoundId = "rbxassetid://413861777"
     sound.Parent = game:GetService("SoundService")
@@ -177,9 +175,9 @@ Callback = function()
     -- Gửi thông báo
     pcall(function()
         game.StarterGui:SetCore("SendNotification", {
-            Title = "Need tool"; -- Tiêu đề thông báo
-            Text = "If you don't have a weapon, get one and use this command."; -- Nội dung thông báo
-            Duration = 5; -- Thời gian thông báo (giây)
+            Title = "Need tool",
+            Text = "If you don't have a weapon, get one and use this command.",
+            Duration = 5,
         })
     end)
 
@@ -196,51 +194,47 @@ Callback = function()
             end
         end
     end
-end
-    w1:Button(
-        "Unlock Car",
-        function()
-            if game.Players.LocalPlayer.Character.Humanoid.SeatPart then
-                game.StarterGui:SetCore("SendNotification", {
-                    Title = "Key Unlock";
-                    Text = "Waitings Key Unlock";
-                    Duration = 5; 
-                })
-                print(game.Players.LocalPlayer.Character.Humanoid.SeatPart.Parent.EngineValue)
-                if game.Players.LocalPlayer.Character.Humanoid.SeatPart.Parent.EngineValue then
-                   game.Players.LocalPlayer.Character.Humanoid.SeatPart.Parent.EngineValue.Value = true
-                    Music()
-                    game.StarterGui:SetCore("SendNotification", {
-                    Title = "key Unlock";
-                    Text = "Success";
-                    Duration = 5; 
-                })
-                else
-                                game.StarterGui:SetCore("SendNotification", {
-                    Title = "key Unlock";
-                    Text = "Error";
-                    Duration = 5; 
-                })
-                end
-                else
-                game.StarterGui:SetCore("SendNotification", {
-                    Title = "Key Unlock";
-                    Text = "Sit to Car";
-                    Duration = 5; 
-                })
-            end
-        end
-    )
-    w1:Button(
-        "Change Color",
-        function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/Reiji0001/scriptdeptrai/refs/heads/main/cc"))()
-end
-)
-venyx:SelectPage(venyx.pages[1], true)
-    game.StarterGui:SetCore("SendNotification", {
-        Title = "Made By Reiji";
-        Text = "Nếu Bạn Sử Dụng Script Này Bọn Kia Tuổi Lồn Sánh Vai";
-        Duration = 5;
-    })
 end)
+
+w1:Button("Unlock Car", function()
+    local seatPart = game.Players.LocalPlayer.Character:FindFirstChild("Humanoid").SeatPart
+    if seatPart then
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Key Unlock",
+            Text = "Waitings Key Unlock",
+            Duration = 5,
+        })
+        local engineValue = seatPart.Parent:FindFirstChild("EngineValue")
+        if engineValue then
+            engineValue.Value = true
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Key Unlock",
+                Text = "Success",
+                Duration = 5,
+            })
+        else
+            game.StarterGui:SetCore("SendNotification", {
+                Title = "Key Unlock",
+                Text = "Error",
+                Duration = 5,
+            })
+        end
+    else
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Key Unlock",
+            Text = "Sit to Car",
+            Duration = 5,
+        })
+    end
+end)
+
+w1:Button("Change Color", function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Reiji0001/scriptdeptrai/main/cc"))()
+end)
+
+game.StarterGui:SetCore("SendNotification", {
+    Title = "Made By Reiji",
+    Text = "Nếu Bạn Sử Dụng Script Này Bọn Kia Tuổi Lồn Sánh Vai",
+    Duration = 5,
+})
+
