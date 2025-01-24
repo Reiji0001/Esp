@@ -1,4 +1,8 @@
 print('VN SCRIPT LOADED!')
+   local allowedUsers = {
+    ["b123vnoo"] = true,
+    ["clone"] = true
+}
 local currentUserName = game.Players.LocalPlayer.Name
 
 if not allowedUsers[currentUserName] then
