@@ -237,4 +237,3 @@ game.StarterGui:SetCore("SendNotification", {
     Text = "Nếu Bạn Sử Dụng Script Này Bọn Kia Tuổi Lồn Sánh Vai",
     Duration = 5,
 })
-
