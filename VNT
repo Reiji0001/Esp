@@ -197,6 +197,7 @@ end
     end
 end)
     w1:Label("Made By Reiji")
+   local w1 = library:Window("VNT Script - 2")
     w1:Button(
         "Change Color",
         function()
@@ -321,6 +322,38 @@ end, function()
 print("Changed Keybind")
 end)
 venyx:SelectPage(venyx.pages[1], true)
+    w1:Button(
+        "Xoá line Hitbox",
+        function()
+Callback = function()
+    local sound = Instance.new("Sound")
+    sound.SoundId = "rbxassetid://413861777"
+    sound.Parent = game:GetService("SoundService")
+    sound:Play()
+
+    -- Gửi thông báo
+    pcall(function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Need tool"; -- Tiêu đề thông báo
+            Text = "If you don't have a weapon, get one and use this command."; -- Nội dung thông báo
+            Duration = 5; -- Thời gian thông báo (giây)
+        })
+    end)
+
+    -- Kiểm tra Tool và SelectionBox
+    local player = game:GetService("Players").LocalPlayer
+    if player.Character then
+        for _, tool in pairs(player.Character:GetChildren()) do
+            if tool:IsA("Tool") and tool:FindFirstChild("Handle") then
+                for _, child in pairs(tool.Handle:GetChildren()) do
+                    if child:IsA("SelectionBox") then
+                        child:Destroy()
+                    end
+                end
+            end
+        end
+    end
+end
     game.StarterGui:SetCore("SendNotification", {
         Title = "Made By Reiji";
         Text = "Nếu Bạn Sử Dụng Script Này Bọn Kia Tuổi Lồn Sánh Vai";
