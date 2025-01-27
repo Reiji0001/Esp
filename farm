@@ -6,6 +6,9 @@ local allowedUsers = {
     ["ArvinSenpai1"] = true,
     ["YumiSenseii"] = true,
     ["hoangbautroi11"] = true,
+    ["foxgoodboy123"] = true,
+    ["emfankia123"] = true,
+    ["seven09812"] = true,
 
 }
 local currentUserName = game.Players.LocalPlayer.Name
@@ -135,7 +138,7 @@ Tabs.Main:AddButton({
                             v.Handle.Massless = true
                             v.Handle.Transparency = 1
                             a.Adornee = v.Handle
-                            v.Handle.Size = Vector3.new(15, 25 , 2)
+                            v.Handle.Size = Vector3.new(9, 9, 9)
                             local selectionBox = Instance.new("SelectionBox",v.Handle)
                             selectionBox.Adornee = v.Handle
                             selectionBox.Color3 = Color3.new(0, 0.313725, 0.47451)
@@ -153,13 +156,13 @@ Tabs.Main:AddButton({
         
                     wait()
                     game.StarterGui:SetCore("SendNotification", {
-                        Title = "Need tool"; -- the title (ofc)
-                        Text = "If you dont have weapon then get one and use this command"; -- what the text says (ofc)
+                        Title = "THG NGU"; -- the title (ofc)
+                        Text = "ĐỊT MẸ MÀY VŨ KHÍ ĐÂU?"; -- what the text says (ofc)
                         Duration = 5; -- how long the notification should in secounds
                     })
                     for i,v in pairs(game:GetService'Players'.LocalPlayer.Character:GetChildren()) do
                         if v:isA("Tool") then
-                            v.Handle.Size = Vector3.new(15, 30 , 2)
+                            v.Handle.Size = Vector3.new(9, 9, 9)
                         end
                     end
                 end
@@ -174,8 +177,8 @@ Tabs.Main:AddButton({
         
                     wait()
                     game.StarterGui:SetCore("SendNotification", {
-                        Title = "Need tool"; -- the title (ofc)
-                        Text = "If you dont have weapon then get one and use this command"; -- what the text says (ofc)
+                        Title = "Cầm cái Vkhi lên"; -- the title (ofc)
+                        Text = "Vũ khí đâu ? Mày Bị Ngu À"; -- what the text says (ofc)
                         Duration = 5; -- how long the notification should in secounds
                     })
                     for i,v in pairs(game:GetService'Players'.LocalPlayer.Character:GetChildren()) do
