@@ -107,6 +107,12 @@ Toggle:OnChanged(function(Value)
     AutoFarmGiangho = Value
 end)
 
+local Toggle = Tabs.Main:AddToggle("AutoGiangHo", {Title = "Auto Giang Ho2", Default = AutoFarmGiangho })
+
+Toggle:OnChanged(function(Value)
+    AutoFarmGiangho2 = Value
+end)
+
 local Toggle = Tabs.Main:AddToggle("AutoGiangHo", {Title = "Auto Buy bang gac", Default = AutoBuyBangGac })
 
 Toggle:OnChanged(function(Value)
@@ -138,7 +144,7 @@ Tabs.Main:AddButton({
                             v.Handle.Massless = true
                             v.Handle.Transparency = 1
                             a.Adornee = v.Handle
-                            v.Handle.Size = Vector3.new(9, 9, 9)
+                            v.Handle.Size = Vector3.new(15, 25 , 2)
                             local selectionBox = Instance.new("SelectionBox",v.Handle)
                             selectionBox.Adornee = v.Handle
                             selectionBox.Color3 = Color3.new(0, 0.313725, 0.47451)
@@ -156,13 +162,13 @@ Tabs.Main:AddButton({
         
                     wait()
                     game.StarterGui:SetCore("SendNotification", {
-                        Title = "THG NGU"; -- the title (ofc)
-                        Text = "ĐỊT MẸ MÀY VŨ KHÍ ĐÂU?"; -- what the text says (ofc)
+                        Title = "Need tool"; -- the title (ofc)
+                        Text = "If you dont have weapon then get one and use this command"; -- what the text says (ofc)
                         Duration = 5; -- how long the notification should in secounds
                     })
                     for i,v in pairs(game:GetService'Players'.LocalPlayer.Character:GetChildren()) do
                         if v:isA("Tool") then
-                            v.Handle.Size = Vector3.new(9, 9, 9)
+                            v.Handle.Size = Vector3.new(15, 30 , 2)
                         end
                     end
                 end
@@ -177,8 +183,8 @@ Tabs.Main:AddButton({
         
                     wait()
                     game.StarterGui:SetCore("SendNotification", {
-                        Title = "Cầm cái Vkhi lên"; -- the title (ofc)
-                        Text = "Vũ khí đâu ? Mày Bị Ngu À"; -- what the text says (ofc)
+                        Title = "Need tool"; -- the title (ofc)
+                        Text = "If you dont have weapon then get one and use this command"; -- what the text says (ofc)
                         Duration = 5; -- how long the notification should in secounds
                     })
                     for i,v in pairs(game:GetService'Players'.LocalPlayer.Character:GetChildren()) do
@@ -331,6 +337,70 @@ spawn(function()
        end
     end
 end)
+
+spawn(function()
+    while wait() do
+        if DisableALLautogiangho then
+            break
+        end
+        if AutoFarmGiangho2 and not DisableALLautogiangho and (Vector3.new(871, 29, -1423) - game.Players.LocalPlayer.Character.HumanoidRootPart.Position).Magnitude <= 5000 then
+            for i,v in pairs(workspace.GiangHo2.NPCs:GetChildren()) do
+               if v:FindFirstChild('HumanoidRootPart') and v:FindFirstChild('Humanoid') and v.Humanoid.Health > 0 then
+                  repeat wait() 
+                  pcall(function()
+                    for i,v in pairs(workspace.GiangHo2.Drop:GetChildren()) do
+                        if v:FindFirstChild("ProximityPrompt") or v:FindFirstChildOfClass('ProximityPrompt') then
+                            local itemdrop = v:FindFirstChild("ProximityPrompt") or v:FindFirstChildOfClass('ProximityPrompt')
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.CFrame
+                            Prompt(itemdrop)
+                        end
+                    end
+                    if game.Players.LocalPlayer.Character.Humanoid.Health > 40 then
+                    for iline,npc in pairs(workspace.GiangHo2.Drop:GetChildren()) do
+                        local npcstatus = npc.values.Chasing.Value
+                        if npcstatus == false then
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0,0,5)
+                            wait(.1)
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0,0,5)
+                        else
+                            npc.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame
+                        end
+                    end
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0,0,5)
+                    if not game.Players.LocalPlayer.Backpack:FindFirstChild(AttackWeapon) and not game.Players.LocalPlayer.Character:FindFirstChild(AttackWeapon) then
+                        UnInventoryWeapon(AttackWeapon)
+                        wait(1)
+                    end
+                    EquipWeapon(AttackWeapon)
+                    game:GetService'VirtualUser':CaptureController()
+                    game:GetService'VirtualUser':Button1Down(Vector2.new(1280, 672))
+                    else
+                        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(871, 29, -1423)
+                        if game.Players.LocalPlayer.Backpack:FindFirstChild('băng gạc') then
+                        EquipWeapon('băng gạc')
+                        else
+                            UnInventoryWeapon('băng gạc')
+                            wait(.5)
+                        end
+                        game:GetService'VirtualUser':CaptureController()
+                        game:GetService'VirtualUser':Button1Down(Vector2.new(1280, 672))
+                    end
+                  end)
+                  until not v:FindFirstChild('HumanoidRootPart') or not v:FindFirstChild('Humanoid') or v.Humanoid.Health <= 0 or DisableALLautogiangho
+               end
+            end
+        end
+    end
+end)
+spawn(function()
+    while wait() do
+       if AutoFarmGiangho2 and not DisableALLautogiangho then
+       game:GetService'VirtualUser':CaptureController()
+       game:GetService'VirtualUser':Button1Down(Vector2.new(1280, 672))
+       end
+    end
+end)
+
 
 function BuyBangGac()
     for i = 1, 50 do
