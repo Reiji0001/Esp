@@ -1,0 +1,138 @@
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/VNT-UNIVERSAL/MyCode/main/UILib"))()
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local workspace = game:GetService("Workspace")
+
+local w1 = library:Window("AHD - Reiji ")
+
+local rebirthEnabled = false
+local fastAttackEnabled = false
+local autoQuestEnabled = false
+local questID = 1
+local questID2 = 1
+local attackSpeed = 10
+local attackRange = 100
+local targets = { "GoldenS", "HumanMonster", "Sonic", "Crablante", "Bahiri", "Boros", "Hammerhead", "DivineMagician", "InfinityMan", "Charanko", "MosquitoGirl", "SeaKing", "LunarCultist", "Kayla", "Kabuto", "Paradiser", "PlatinumS", "Phoenix", "Psykos", "Raijin", "Rock", "SamuraiDisciple", "Seafolk", "Shinigami", "Skyroach", "SkyroachKing", "SylphQueen", "ThunderCloud", "Tyrone", "VaccineMan", "Werewolf", "Void", "VoidCrystal", "Voidlet", "WindFairy", "Gouketsu", "Fendstrum", "EvilCarrot", "DivineMagician", "DivineKnightCaptain", "DivineKnight", "DivineBrute", "DemonSlime", "CursedStudent", "Criminal", "CosmicHumanMonster", "CatBoy", "AwakenedHumanMonster", "Abnormal", "AtomicSamurai", "Auroris", "Claire", "Choid", "CursedKing", "LunarCore", "Sdjkfjsdgha", "" }
+
+w1:Slider("Tốc độ Fast Attack", 1, 5, 25, function(value)
+    attackSpeed = value
+end)
+
+w1:Toggle("Fast Attack ", "FAT", false, function(state)
+    fastAttackEnabled = state
+
+    if fastAttackEnabled then
+        task.spawn(function()
+            while fastAttackEnabled do
+                local hitTargets = {}
+
+                local character = LocalPlayer.Character
+                if character and character:FindFirstChild("HumanoidRootPart") then
+                    local playerPosition = character.HumanoidRootPart.Position
+
+                    for _, targetName in ipairs(targets) do
+                        local targetParent = workspace:FindFirstChild("Spawns") and workspace.Spawns:FindFirstChild(targetName)
+                        if targetParent then
+                            for _, target in ipairs(targetParent:GetChildren()) do
+                                if target:IsA("Model") and target:FindFirstChild("HumanoidRootPart") and target:FindFirstChild("Humanoid") then
+                                    local distance = (target.HumanoidRootPart.Position - playerPosition).Magnitude
+                                    if distance <= attackRange and target.Humanoid.Health > 0 then
+                                        table.insert(hitTargets, target)
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    if #hitTargets > 0 then
+                        local args = {
+                            [1] = "PunchHit",
+                            [2] = hitTargets
+                        }
+
+                        for _ = 1, attackSpeed do
+                            task.spawn(function()
+                                ReplicatedStorage.Modules.Net["RE/CombatEvent"]:FireServer(unpack(args))
+                            end)
+                        end
+                    end
+                end
+
+                task.wait(0.05) -- Delay nhẹ để tránh spam server
+            end
+        end)
+    end
+end)
+
+w1:Toggle("Rebirth", "Rebirth", false, function(state)
+    rebirthEnabled = state -- Cập nhật trạng thái toggle
+
+    if rebirthEnabled then
+        -- Bắt đầu vòng lặp khi toggle bật
+        while rebirthEnabled do
+            -- Gọi chức năng Rebirth khi Toggle bật
+            ReplicatedStorage.Modules.Net["RE/AscendantRebirth"]:FireServer()
+            task.wait() -- Thêm delay nhỏ sau khi Rebirth
+        end
+    end
+end)
+
+w1:Button("Spin", function()
+    ReplicatedStorage.Modules.Net["RF/SpinClass"]:InvokeServer()
+end)
+w1:Label("Made By Reiji")
+local w1 = library:Window("Quest - Reiji ")
+
+w1:Slider("Chọn Quest", 1, 1, 33, function(value)
+    questID = value 
+end)
+
+w1:Toggle("Auto GetQuest", "AGQ", false, function(state)
+    autoQuestEnabled = state
+
+    if autoQuestEnabled then
+        task.spawn(function() 
+            while autoQuestEnabled do
+                local args = {
+                    [1] = "GetQuest",
+                    [2] = questID
+                }
+                ReplicatedStorage.Modules.Net["RE/Quest"]:FireServer(unpack(args))
+                task.wait(0.1) 
+            end
+        end)
+    end
+end)
+
+w1:Slider("Chọn Quest", 1, 1, 21, function(value)
+    questID2 = value 
+end)
+
+w1:Toggle("Auto GetQuest2", "AGQ", false, function(state)
+    autoQuestEnabled2 = state
+
+    if autoQuestEnabled2 then
+        task.spawn(function() 
+            while autoQuestEnabled2 do
+                local args = {
+                    [1] = "GetAscendantQuest",
+                    [2] = questID2
+                }
+                ReplicatedStorage.Modules.Net["RE/Quest"]:FireServer(unpack(args))
+                task.wait(0.1) 
+            end
+        end)
+    end
+end)
+
+
+w1:Label("Made By Reiji")
+
+w1:Button("Đóng Menu", function()
+    for _, v in pairs(game.CoreGui:GetChildren()) do
+        if v:FindFirstChild("Top") then
+            v:Destroy()
+        end
+    end
+end)
