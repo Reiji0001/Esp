@@ -82,7 +82,6 @@ w1:Button("Spin", function()
     ReplicatedStorage.Modules.Net["RF/SpinClass"]:InvokeServer()
 end)
 w1:Label("Made By Reiji")
-local w1 = library:Window("Quest - Reiji ")
 
 w1:Slider("Chọn Quest", 1, 1, 33, function(value)
     questID = value 
