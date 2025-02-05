@@ -28,34 +28,6 @@ end
         end
     )
     w1:Button(
-        "HitBox",
-        function()
-            local sound = Instance.new("Sound")
-            sound.SoundId = "rbxassetid://413861777"
-            sound.Parent = game:GetService("SoundService")
-            sound:Play()
-        
-            wait()
-            game.StarterGui:SetCore("SendNotification", {
-                Title = "Need tool"; -- the title (ofc)
-                Text = "If you dont have weapon then get one and use this command"; -- what the text says (ofc)
-                Duration = 5; -- how long the notification should in secounds
-            })
-            for i,v in pairs(game:GetService'Players'.LocalPlayer.Character:GetChildren()) do
-                if v:isA("Tool") then
-                    local a = Instance.new("SelectionBox",v.Handle)
-                    v.Handle.Massless = true
-                    v.Handle.Transparency = 1
-                    a.Adornee = v.Handle
-                    v.Handle.Size = Vector3.new(10, 10, 10)
-                    local selectionBox = Instance.new("SelectionBox",v.Handle)
-                    selectionBox.Adornee = v.Handle
-                    selectionBox.Color3 = Color3.new(0, 0.313725, 0.47451)
-                end
-            end
-        end
-    )
-    w1:Button(
         "Reach",
         function()
             local sound = Instance.new("Sound")
