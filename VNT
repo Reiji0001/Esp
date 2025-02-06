@@ -31,9 +31,6 @@ if not allowedUsers[currentUserName] then
     })
     return
 end
-    loadstring(game:HttpGet("https://shzwl.sbs/loaders/discordx2swnz.lua"))()
-    wait()
-    loadstring(game:HttpGet("https://shzwl.sbs/loaders/godmode.lua"))()
     local library = loadstring(game.HttpGet(game, "https://raw.githubusercontent.com/VNT-UNIVERSAL/MyCode/main/UILib"))()
     local w1 = library:Window("VNT Script PVP - Reiji ")
     w1:Toggle(
@@ -42,14 +39,6 @@ end
         false,
         function(toggled)
             AutoLayBangGac = toggled
-        end
-    )
-    w1:Toggle(
-        "Inf Health",
-        "God Mode",
-        false,
-        function(toggled)
-            _G.xsnwz = toggled
         end
     )
     w1:Button(
