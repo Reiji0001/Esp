@@ -1,21 +1,18 @@
-local function onChildAdded(child)
-    if child.Name == "DonoBoard" then
-        child:Destroy()
-        warn("Quay lai an cac a")
+local function removeDonoBoards(parent)
+    for _, v in pairs(parent:GetChildren()) do
+        if v.Name == "DonoBoard" then
+            v:Destroy()
+            warn("Anti-cheat: Đã xóa DonoBoard")
+        end
+        -- Kiểm tra tiếp trong các con cháu (đệ quy, nhưng tránh GetDescendants)
+        removeDonoBoards(v)
     end
 end
 
--- Chỉ kiểm tra trong các thư mục quan trọng
+-- Kiểm tra trong các thư mục quan trọng thay vì toàn bộ game
 local importantFolders = {game.Workspace, game.Players, game.ReplicatedStorage, game.StarterGui}
-
 for _, folder in pairs(importantFolders) do
-    local dono = folder:FindFirstChild("DonoBoard")
-    if dono then
-        dono:Destroy()
-        warn("trash anti cheat")
-    end
-
-    folder.ChildAdded:Connect(onChildAdded)
+    removeDonoBoards(folder)
 end
 local allowedUsers = {
     ["phubentau"] = true,
