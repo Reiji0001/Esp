@@ -1,7 +1,6 @@
 local allowedUsers = loadstring(game:HttpGet("https://raw.githubusercontent.com/skidconmemay1ytikx/Cuduyto100m/refs/heads/main/Cuduydai100m"))()
 local currentUserName = game.Players.LocalPlayer.Name
 if not allowedUsers[currentUserName] then
-player:Kick("địt mẹ bú liếm con cặc t địt cả lò nhà mày mẹ mày là con phò Quỳ Xuống")
 print('VN SCRIPT LOADED!')
 
 Game:GetService("RunService").Heartbeat:Connect(function()
