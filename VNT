@@ -1,22 +1,17 @@
-local function removeDonoBoards(parent)
-    for _, v in pairs(parent:GetChildren()) do
-        if v.Name == "DonoBoard" then
-            v:Destroy()
-            warn("Anti-cheat: Đã xóa DonoBoard")
-        end
-        -- Kiểm tra tiếp trong các con cháu (đệ quy, nhưng tránh GetDescendants)
-        removeDonoBoards(v)
-    end
-end
+local player = game:GetService("Players").LocalPlayer
+local playerScripts = player:FindFirstChild("PlayerScripts")
 
--- Kiểm tra trong các thư mục quan trọng thay vì toàn bộ game
-local importantFolders = {game.Workspace, game.Players, game.ReplicatedStorage, game.StarterGui}
-for _, folder in pairs(importantFolders) do
-    removeDonoBoards(folder)
+if playerScripts then
+    local donoBoard = playerScripts:FindFirstChild("DonoBoard")
+    if donoBoard then
+        donoBoard:Destroy()
+        warn("Anti cheat hai vc")
+    end
 end
 local allowedUsers = {
     ["phubentau"] = true,
-    ["anhtthuc03"] = true
+    ["anhtthuc03"] = true,
+    ["leeseen5678"] = true,
 }
 local currentUserName = game.Players.LocalPlayer.Name
 
