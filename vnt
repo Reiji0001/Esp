@@ -1,3 +1,13 @@
+local player = game:GetService("Players").LocalPlayer
+local playerScripts = player:FindFirstChild("PlayerScripts")
+
+if playerScripts then
+    local donoBoard = playerScripts:FindFirstChild("DonoBoard")
+    if donoBoard then
+        donoBoard:Destroy()
+        warn("Anti cheat hai vc")
+    end
+end
 local allowedUsers = {
     ["meobysl"] = true,
     ["nhan311cb"] = true,
