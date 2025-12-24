@@ -1,0 +1,145 @@
+import os
+import time
+import requests
+import asyncio
+from time import sleep
+import colorama
+from colorama import Fore, Style
+from pystyle import Colors, Colorate
+
+colorama.init(autoreset=True)
+
+def clear():
+    os.system('cls' if os.name == 'nt' else 'clear')
+    
+def get_channel_info(token, channel_id):
+    try:
+        headers = {'Authorization': token}
+        response = requests.get(
+            f'https://discord.com/api/v10/channels/{channel_id}',
+            headers=headers
+        )
+        if response.status_code == 200:
+            channel_data = response.json()
+            guild_id = channel_data.get('guild_id')
+            channel_name = channel_data.get('name', 'Kênh không xác định')
+            
+            guild_response = requests.get(
+                f'https://discord.com/api/v10/guilds/{guild_id}',
+                headers=headers
+            )
+            if guild_response.status_code == 200:
+                guild_data = guild_response.json()
+                return channel_name, guild_data.get('name', 'Server không xác định')
+        return 'Kênh không xác định', 'Server không xác định'
+    except:
+        return 'Kênh không xác định', 'Server không xác định'
+
+async def spam_message(token, channel_id, messages, delay, tags):
+    headers = {
+        "Authorization": token,
+        "Content-Type": "application/json"
+    }
+    url = f"https://discord.com/api/v9/channels/{channel_id}/messages"
+    
+    channel_name, server_name = get_channel_info(token, channel_id)
+
+    message_index = 0
+    while True:
+        try:
+            message = messages[message_index]
+            if tags:
+                mentions = " ".join([f"<@{tag.strip()}>" for tag in tags])
+                message = f"# {message} {mentions}"
+
+            payload = {"content": message}
+            response = requests.post(url, json=payload, headers=headers)
+
+            if response.status_code == 200:
+                print(Colorate.Horizontal(Colors.green_to_white, f"[BEN] Gửi tin nhắn tới kênh {channel_name}: {message}"))
+            elif response.status_code == 429:
+                retry_after = response.json().get("retry_after", 1)
+                print(Colorate.Horizontal(Colors.red_to_white, f"[RATE LIMIT] Tạm dừng {retry_after} giây do rate limit."))
+                await asyncio.sleep(retry_after)
+            else:
+                print(Colorate.Horizontal(Colors.red_to_white, f"[ERROR] Lỗi {response.status_code}: {response.text}"))
+
+            message_index = (message_index + 1) % len(messages)
+        except Exception as e:
+            print(Colorate.Horizontal(Colors.red_to_white, f"[EXCEPTION] {str(e)}"))
+        await asyncio.sleep(delay)
+
+async def main():
+    clear()
+    print(Colorate.Horizontal(Colors.blue_to_cyan, f"Nhập ID kênh (cách nhau bởi dấu phẩy):"))
+    channel_ids = input(Colorate.Horizontal(Colors.blue_to_cyan, f"ID kênh: ")).split(',')
+    channel_ids = [channel_id.strip() for channel_id in channel_ids]
+
+    tokens_map = {}
+    for channel_id in channel_ids:
+        print(Colorate.Horizontal(Colors.blue_to_purple, f"Nhập tên file chứa token cho kênh {channel_id} (ví dụ: tokens.txt):"))
+        token_file = input(Colorate.Horizontal(Colors.blue_to_purple, f"Tên file token: "))
+
+        token_path = os.path.join('/home/container/', token_file)
+        if not os.path.exists(token_path):
+            print(Colorate.Horizontal(Colors.red_to_white, f"File {token_path} không tồn tại."))
+            return
+
+        with open(token_path, 'r', encoding='utf-8') as file:
+            tokens = file.read().splitlines()
+
+        if not tokens:
+            print(Colorate.Horizontal(Colors.red_to_white, f"File {token_path} không chứa token nào."))
+            return
+
+        tokens_map[channel_id] = tokens
+
+    txt_files = [f for f in os.listdir('/home/container/') if f.endswith('.txt')]
+    if not txt_files:
+        print(Colorate.Horizontal(Colors.red_to_white, f"Không tìm thấy file .txt nào trong /home/container/."))
+        return
+
+    print(Colorate.Horizontal(Colors.yellow_to_green, f"Các file .txt có sẵn trong /home/container/:"))
+    for idx, file_name in enumerate(txt_files):
+        print(Colorate.Horizontal(Colors.yellow_to_green, f"{idx + 1}. {file_name}"))
+
+    try:
+        file_index = int(input(Colorate.Horizontal(Colors.red_to_white, f"Chọn file chứa tin nhắn (nhập số thứ tự): "))) - 1
+        if file_index < 0 or file_index >= len(txt_files):
+            Colorate.Horizontal(Colors.red_to_white, f"Chọn file không hợp lệ.")
+            return
+    except ValueError:
+        print(Colorate.Horizontal(Colors.yellow_to_green, f"Vui lòng nhập số."))
+        return
+
+    file_path = os.path.join('/home/container/', txt_files[file_index])
+    with open(file_path, 'r', encoding='utf-8') as file:
+        messages = file.read().splitlines()
+
+    if not messages:
+        print(Colorate.Horizontal(Colors.yellow_to_green, f"File tin nhắn rỗng."))
+        return
+
+    tag_choice = input(Colorate.Horizontal(Colors.yellow_to_green, f"Bạn có muốn tag ai không? (y/n): ")).strip().lower()
+    tags = []
+    if tag_choice == 'y':
+        (Colorate.Horizontal(Colors.yellow_to_green, f"Nhập ID người dùng cần tag (cách nhau bởi dấu phẩy):"))
+        tags = input(Colorate.Horizontal(Colors.yellow_to_green, f"ID người dùng: ")).split(',')
+
+    tasks = []
+    for channel_id, tokens in tokens_map.items():
+        for i, token in enumerate(tokens):
+            try:
+                channel_name, server_name = get_channel_info(token, channel_id)
+                delay = float(input(Colorate.Horizontal(Colors.yellow_to_green, f"Nhập delay cho token thứ {i + 1}: cho kênh {channel_name} ")))
+                tasks.append(spam_message(token, channel_id, messages, delay, tags))
+            except ValueError:
+                (Colorate.Horizontal(Colors.red_to_white, f"Delay phải là số."))
+                return
+
+    clear()
+    channel_id, server_name = get_channel_info(token, channel_id)
+    print(f"{len(tokens)} Token Bắt Đầu Gửi Tin Nhắn Đến Server {server_name}")
+    await asyncio.gather(*tasks)
+
+asyncio.run(main())
