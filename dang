@@ -1,6 +1,8 @@
 import os
+import time
 import requests
 import asyncio
+import random
 from time import sleep
 import colorama
 from colorama import Fore, Style
@@ -8,14 +10,12 @@ from pystyle import Colors, Colorate
 
 colorama.init(autoreset=True)
 
-CONTAINER_PATH = "/home/container/"
-
 def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
-    
+
 def get_channel_info(token, channel_id):
     try:
-        headers = {'Authorization': token.strip()}
+        headers = {'Authorization': token}
         response = requests.get(
             f'https://discord.com/api/v10/channels/{channel_id}',
             headers=headers
@@ -38,17 +38,19 @@ def get_channel_info(token, channel_id):
 
 async def spam_message(token, channel_id, messages, delay, tags):
     headers = {
-        "Authorization": token.strip(),
+        "Authorization": token,
         "Content-Type": "application/json"
     }
+    # Dùng v9 để tránh một số restriction mới ở v10 với user token
     url = f"https://discord.com/api/v9/channels/{channel_id}/messages"
     
     channel_name, server_name = get_channel_info(token, channel_id)
-    message_index = 0
 
     while True:
         try:
-            message = messages[message_index]
+            # Chọn tin nhắn NGẪU NHIÊN thay vì lần lượt
+            message = random.choice(messages)
+            
             if tags:
                 mentions = " ".join([f"<@{tag.strip()}>" for tag in tags])
                 message = f"# {message} {mentions}"
@@ -59,88 +61,103 @@ async def spam_message(token, channel_id, messages, delay, tags):
             if response.status_code == 200:
                 print(Colorate.Horizontal(Colors.green_to_white, f"[BEN] Gửi tin nhắn tới kênh {channel_name}: {message}"))
             elif response.status_code == 429:
-                retry_after = response.json().get("retry_after", 1)
-                print(Colorate.Horizontal(Colors.red_to_white, f"[RATE LIMIT] Tạm dừng {retry_after} giây do rate limit."))
+                retry_after = response.json().get("retry_after", 1) + 0.2  # Thêm buffer nhỏ để an toàn
+                print(Colorate.Horizontal(Colors.red_to_white, f"[RATE LIMIT] Tạm dừng {retry_after:.2f} giây do rate limit."))
                 await asyncio.sleep(retry_after)
             else:
                 print(Colorate.Horizontal(Colors.red_to_white, f"[ERROR] Lỗi {response.status_code}: {response.text}"))
 
-            message_index = (message_index + 1) % len(messages)
         except Exception as e:
             print(Colorate.Horizontal(Colors.red_to_white, f"[EXCEPTION] {str(e)}"))
+        
+        # Delay giữa các lần gửi của cùng một token
         await asyncio.sleep(delay)
 
 async def main():
     clear()
-    print(Colorate.Horizontal(Colors.blue_to_cyan, f"Nhập ID kênh (cách nhau bởi dấu phẩy):"))
-    channel_ids = input(Colorate.Horizontal(Colors.blue_to_cyan, f"ID kênh: ")).split(',')
-    channel_ids = [c.strip() for c in channel_ids]
+    print(Colorate.Horizontal(Colors.blue_to_cyan, "=== DISCORD SPAMMER (RANDOM & NHANH HƠN) ===\n"))
+    
+    print(Colorate.Horizontal(Colors.blue_to_cyan, "Nhập ID kênh (cách nhau bởi dấu phẩy nếu nhiều kênh):"))
+    channel_ids = input(Colorate.Horizontal(Colors.blue_to_cyan, "ID kênh: ")).split(',')
+    channel_ids = [channel_id.strip() for channel_id in channel_ids]
 
     tokens_map = {}
     for channel_id in channel_ids:
-        print(Colorate.Horizontal(Colors.blue_to_purple, f"Nhập tên file token cho kênh {channel_id} (ví dụ: tokens.txt):"))
-        token_file = input(Colorate.Horizontal(Colors.blue_to_purple, f"Tên file token: "))
-        token_path = os.path.join(CONTAINER_PATH, token_file)
+        print(Colorate.Horizontal(Colors.blue_to_purple, f"\nCho kênh {channel_id}:"))
+        print(Colorate.Horizontal(Colors.blue_to_purple, "Nhập tên file chứa token (ví dụ: tokens.txt):"))
+        token_file = input(Colorate.Horizontal(Colors.blue_to_purple, "Tên file token: ")).strip()
 
-        if not os.path.exists(token_path):
-            print(Colorate.Horizontal(Colors.red_to_white, f"File {token_path} không tồn tại."))
+        if not os.path.exists(token_file):
+            print(Colorate.Horizontal(Colors.red_to_white, f"File {token_file} không tồn tại!"))
             return
 
-        with open(token_path, 'r', encoding='utf-8') as f:
-            tokens = [t.strip() for t in f.read().splitlines() if t.strip()]
+        with open(token_file, 'r', encoding='utf-8') as file:
+            tokens = [line.strip() for line in file.readlines() if line.strip()]
 
         if not tokens:
-            print(Colorate.Horizontal(Colors.red_to_white, f"File {token_path} không chứa token nào."))
+            print(Colorate.Horizontal(Colors.red_to_white, f"File {token_file} không chứa token nào!"))
             return
 
         tokens_map[channel_id] = tokens
 
-    txt_files = [f for f in os.listdir(CONTAINER_PATH) if f.endswith('.txt')]
+    # Liệt kê các file .txt trong thư mục hiện tại
+    txt_files = [f for f in os.listdir() if f.endswith('.txt') and f not in tokens_map.values()]
     if not txt_files:
-        print(Colorate.Horizontal(Colors.red_to_white, f"Không tìm thấy file .txt nào trong {CONTAINER_PATH}."))
+        print(Colorate.Horizontal(Colors.red_to_white, "Không tìm thấy file .txt nào chứa tin nhắn trong thư mục!"))
         return
 
-    print(Colorate.Horizontal(Colors.yellow_to_green, f"Các file .txt có sẵn trong {CONTAINER_PATH}:"))
+    print(Colorate.Horizontal(Colors.yellow_to_green, "\nCác file .txt chứa tin nhắn có sẵn:"))
     for idx, file_name in enumerate(txt_files):
-        print(Colorate.Horizontal(Colors.yellow_to_green, f"{idx+1}. {file_name}"))
+        print(Colorate.Horizontal(Colors.yellow_to_green, f"{idx + 1}. {file_name}"))
 
     try:
-        file_index = int(input(Colorate.Horizontal(Colors.red_to_white, f"Chọn file chứa tin nhắn (nhập số thứ tự): "))) - 1
+        file_index = int(input(Colorate.Horizontal(Colors.yellow_to_green, "Chọn file chứa tin nhắn (nhập số thứ tự): "))) - 1
         if file_index < 0 or file_index >= len(txt_files):
-            print(Colorate.Horizontal(Colors.red_to_white, f"Chọn file không hợp lệ."))
+            print(Colorate.Horizontal(Colors.red_to_white, "Số thứ tự không hợp lệ!"))
             return
     except ValueError:
-        print(Colorate.Horizontal(Colors.yellow_to_green, f"Vui lòng nhập số."))
+        print(Colorate.Horizontal(Colors.red_to_white, "Vui lòng nhập số hợp lệ!"))
         return
 
-    file_path = os.path.join(CONTAINER_PATH, txt_files[file_index])
-    with open(file_path, 'r', encoding='utf-8') as f:
-        messages = [m.strip() for m in f.read().splitlines() if m.strip()]
+    file_path = txt_files[file_index]
+    with open(file_path, 'r', encoding='utf-8') as file:
+        messages = [line.strip() for line in file.readlines() if line.strip()]
 
     if not messages:
-        print(Colorate.Horizontal(Colors.yellow_to_green, f"File tin nhắn rỗng."))
+        print(Colorate.Horizontal(Colors.red_to_white, "File tin nhắn rỗng!"))
         return
 
-    tag_choice = input(Colorate.Horizontal(Colors.yellow_to_green, f"Bạn có muốn tag ai không? (y/n): ")).strip().lower()
+    # Tag người dùng (tùy chọn)
+    tag_choice = input(Colorate.Horizontal(Colors.yellow_to_green, "\nBạn có muốn tag người dùng không? (y/n): ")).strip().lower()
     tags = []
     if tag_choice == 'y':
-        input(Colorate.Horizontal(Colors.yellow_to_green, f"Nhập ID người dùng cần tag (cách nhau bởi dấu phẩy):"))
-        tags = [t.strip() for t in input(Colorate.Horizontal(Colors.yellow_to_green, f"ID người dùng: ")).split(',')]
+        tag_input = input(Colorate.Horizontal(Colors.yellow_to_green, "Nhập ID người dùng cần tag (cách nhau bởi dấu phẩy): "))
+        tags = [tag.strip() for tag in tag_input.split(',') if tag.strip()]
 
+    # Thu thập delay cho từng token
     tasks = []
+    total_tokens = 0
     for channel_id, tokens in tokens_map.items():
+        channel_name, server_name = get_channel_info(tokens[0], channel_id)  # Lấy tên kênh từ token đầu
+        print(Colorate.Horizontal(Colors.cyan_to_blue, f"\n=== Kênh: {channel_name} | Server: {server_name} ==="))
+        
         for i, token in enumerate(tokens):
             try:
-                channel_name, server_name = get_channel_info(token, channel_id)
-                delay = float(input(Colorate.Horizontal(Colors.yellow_to_green, f"Nhập delay cho token thứ {i+1}: cho kênh {channel_name} ")))
+                delay_input = input(Colorate.Horizontal(Colors.yellow_to_green, 
+                    f"Delay (giây) cho token {i + 1}/{len(tokens)} (khuyến nghị 0.8-2.0 để tránh ban): "))
+                delay = float(delay_input)
+                if delay < 0.5:
+                    print(Colorate.Horizontal(Colors.red_to_white, "   Delay quá thấp có thể gây rate limit nhanh!"))
                 tasks.append(spam_message(token, channel_id, messages, delay, tags))
+                total_tokens += 1
             except ValueError:
-                print(Colorate.Horizontal(Colors.red_to_white, f"Delay phải là số."))
+                print(Colorate.Horizontal(Colors.red_to_white, "Delay phải là số! Dừng chương trình."))
                 return
 
     clear()
-    _, server_name = get_channel_info(token, channel_id)
-    print(f"{len(tokens)} Token bắt đầu gửi tin nhắn đến Server {server_name}")
+    print(Colorate.Horizontal(Colors.green_to_cyan, f"🚀 BẮT ĐẦU SPAM VỚI {total_tokens} TOKEN 🚀"))
+    print(Colorate.Horizontal(Colors.green_to_cyan, "Tin nhắn sẽ được gửi NGẪU NHIÊN và NHANH hơn!\n"))
     await asyncio.gather(*tasks)
 
-asyncio.run(main())
+if __name__ == "__main__":
+    asyncio.run(main())
