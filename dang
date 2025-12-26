@@ -1,7 +1,9 @@
 import os
+import time
 import requests
 import asyncio
 import random
+from time import sleep
 import colorama
 from colorama import Fore, Style
 from pystyle import Colors, Colorate
@@ -14,31 +16,39 @@ def clear():
 def get_channel_info(token, channel_id):
     try:
         headers = {'Authorization': token}
-        response = requests.get(f'https://discord.com/api/v10/channels/{channel_id}', headers=headers)
+        response = requests.get(
+            f'https://discord.com/api/v10/channels/{channel_id}',
+            headers=headers
+        )
         if response.status_code == 200:
-            data = response.json()
-            guild_id = data.get('guild_id')
-            channel_name = data.get('name', 'Unknown Channel')
-            if guild_id:
-                guild_resp = requests.get(f'https://discord.com/api/v10/guilds/{guild_id}', headers=headers)
-                if guild_resp.status_code == 200:
-                    return channel_name, guild_resp.json().get('name', 'Unknown Server')
-            return channel_name, 'Unknown Server'
-        return 'Unknown Channel', 'Unknown Server'
+            channel_data = response.json()
+            guild_id = channel_data.get('guild_id')
+            channel_name = channel_data.get('name', 'Kênh không xác định')
+            
+            guild_response = requests.get(
+                f'https://discord.com/api/v10/guilds/{guild_id}',
+                headers=headers
+            )
+            if guild_response.status_code == 200:
+                guild_data = guild_response.json()
+                return channel_name, guild_data.get('name', 'Server không xác định')
+        return 'Kênh không xác định', 'Server không xác định'
     except:
-        return 'Unknown Channel', 'Unknown Server'
+        return 'Kênh không xác định', 'Server không xác định'
 
-async def spam_message(token, channel_id, messages, base_delay, random_range, tags):
+async def spam_message(token, channel_id, messages, delay, tags):
     headers = {
         "Authorization": token,
         "Content-Type": "application/json"
     }
-    url = f"https://discord.com/api/v9/channels/{channel_id}/messages"  # v9 ổn định hơn với user token
+    # Dùng v9 để tránh một số restriction mới ở v10 với user token
+    url = f"https://discord.com/api/v9/channels/{channel_id}/messages"
     
     channel_name, server_name = get_channel_info(token, channel_id)
 
     while True:
         try:
+            # Chọn tin nhắn NGẪU NHIÊN thay vì lần lượt
             message = random.choice(messages)
             
             if tags:
@@ -46,137 +56,107 @@ async def spam_message(token, channel_id, messages, base_delay, random_range, ta
                 message = f"# {message} {mentions}"
 
             payload = {"content": message}
-            r = requests.post(url, json=payload, headers=headers)
+            response = requests.post(url, json=payload, headers=headers)
 
-            if r.status_code == 200:
-                print(Colorate.Horizontal(Colors.green_to_white, f"[+] {channel_name} | {message[:50]}{'...' if len(message)>50 else ''}"))
-            elif r.status_code == 429:
-                retry_after = r.json().get("retry_after", 1) + 0.3
-                print(Colorate.Horizontal(Colors.red_to_white, f"[RATE LIMIT] Token bị limit {retry_after:.1f}s"))
+            if response.status_code == 200:
+                print(Colorate.Horizontal(Colors.green_to_white, f"[BEN] Gửi tin nhắn tới kênh {channel_name}: {message}"))
+            elif response.status_code == 429:
+                retry_after = response.json().get("retry_after", 1) + 0.2  # Thêm buffer nhỏ để an toàn
+                print(Colorate.Horizontal(Colors.red_to_white, f"[RATE LIMIT] Tạm dừng {retry_after:.2f} giây do rate limit."))
                 await asyncio.sleep(retry_after)
-                continue
             else:
-                # Nếu token die (401) hoặc lỗi khác → bỏ qua không spam nữa
-                if r.status_code == 401:
-                    print(Colorate.Horizontal(Colors.red_to_white, f"[INVALID] Token hết hạn hoặc bị ban"))
-                    break
-                # Các lỗi khác in ra nhưng tiếp tục
-                # print(Colorate.Horizontal(Colors.red_to_white, f"[ERROR {r.status_code}]"))
-
-            # Random delay để tránh pattern đều
-            actual_delay = base_delay + random.uniform(-random_range, random_range)
-            await asyncio.sleep(max(0.1, actual_delay))  # ít nhất 0.1s
+                print(Colorate.Horizontal(Colors.red_to_white, f"[ERROR] Lỗi {response.status_code}: {response.text}"))
 
         except Exception as e:
-            print(Colorate.Horizontal(Colors.red_to_white, f"[EXCEPTION] {e}"))
-            await asyncio.sleep(2)
+            print(Colorate.Horizontal(Colors.red_to_white, f"[EXCEPTION] {str(e)}"))
+        
+        # Delay giữa các lần gửi của cùng một token
+        await asyncio.sleep(delay)
 
 async def main():
     clear()
-    print(Colorate.Horizontal(Colors.blue_to_cyan, "=== DISCORD SPAMMER SIÊU NHANH - MULTI TOKEN ===\n"))
-
-    # Nhập channel IDs
-    channel_input = input(Colorate.Horizontal(Colors.cyan_to_blue, "Nhập ID kênh (cách nhau bằng dấu phẩy): ")).strip()
-    channel_ids = [cid.strip() for cid in channel_input.split(',') if cid.strip()]
-
-    if not channel_ids:
-        print(Colorate.Horizontal(Colors.red_to_white, "Không có kênh nào được nhập!"))
-        return
+    print(Colorate.Horizontal(Colors.blue_to_cyan, "=== DISCORD SPAMMER (RANDOM & NHANH HƠN) ===\n"))
+    
+    print(Colorate.Horizontal(Colors.blue_to_cyan, "Nhập ID kênh (cách nhau bởi dấu phẩy nếu nhiều kênh):"))
+    channel_ids = input(Colorate.Horizontal(Colors.blue_to_cyan, "ID kênh: ")).split(',')
+    channel_ids = [channel_id.strip() for channel_id in channel_ids]
 
     tokens_map = {}
-    total_tokens = 0
-
-    # Nhập token file cho từng kênh
     for channel_id in channel_ids:
-        print(f"\n--- Kênh ID: {channel_id} ---")
-        token_file = input(Colorate.Horizontal(Colors.blue_to_purple, "Tên file token (ví dụ: tokens1.txt): ")).strip()
-        
+        print(Colorate.Horizontal(Colors.blue_to_purple, f"\nCho kênh {channel_id}:"))
+        print(Colorate.Horizontal(Colors.blue_to_purple, "Nhập tên file chứa token (ví dụ: tokens.txt):"))
+        token_file = input(Colorate.Horizontal(Colors.blue_to_purple, "Tên file token: ")).strip()
+
         if not os.path.exists(token_file):
-            print(Colorate.Horizontal(Colors.red_to_white, f"File {token_file} không tồn tại! Bỏ qua kênh này."))
-            continue
-        
-        with open(token_file, 'r', encoding='utf-8') as f:
-            tokens = [line.strip() for line in f if line.strip()]
-        
+            print(Colorate.Horizontal(Colors.red_to_white, f"File {token_file} không tồn tại!"))
+            return
+
+        with open(token_file, 'r', encoding='utf-8') as file:
+            tokens = [line.strip() for line in file.readlines() if line.strip()]
+
         if not tokens:
-            print(Colorate.Horizontal(Colors.red_to_white, "File token rỗng! Bỏ qua kênh."))
-            continue
-        
+            print(Colorate.Horizontal(Colors.red_to_white, f"File {token_file} không chứa token nào!"))
+            return
+
         tokens_map[channel_id] = tokens
-        total_tokens += len(tokens)
-        print(Colorate.Horizontal(Colors.green_to_white, f"Đã load {len(tokens)} token cho kênh {channel_id}"))
 
-    if total_tokens == 0:
-        print(Colorate.Horizontal(Colors.red_to_white, "Không có token hợp lệ nào!"))
-        return
-
-    # Chọn file tin nhắn
-    txt_files = [f for f in os.listdir('.') if f.endswith('.txt') and f.lower() not in [tf.lower() for tf_list in tokens_map.values() for tf in tf_list]]
-    txt_files = list(set(txt_files))  # tránh trùng
-
+    # Liệt kê các file .txt trong thư mục hiện tại
+    txt_files = [f for f in os.listdir() if f.endswith('.txt') and f not in tokens_map.values()]
     if not txt_files:
-        print(Colorate.Horizontal(Colors.red_to_white, "Không tìm thấy file tin nhắn .txt nào!"))
+        print(Colorate.Horizontal(Colors.red_to_white, "Không tìm thấy file .txt nào chứa tin nhắn trong thư mục!"))
         return
 
-    print("\nFile tin nhắn có sẵn:")
-    for i, f in enumerate(txt_files):
-        print(Colorate.Horizontal(Colors.yellow_to_green, f"{i+1}. {f}"))
-    
+    print(Colorate.Horizontal(Colors.yellow_to_green, "\nCác file .txt chứa tin nhắn có sẵn:"))
+    for idx, file_name in enumerate(txt_files):
+        print(Colorate.Horizontal(Colors.yellow_to_green, f"{idx + 1}. {file_name}"))
+
     try:
-        choice = int(input(Colorate.Horizontal(Colors.yellow_to_green, "Chọn file tin nhắn (số): "))) - 1
-        msg_file = txt_files[choice]
-    except:
-        print(Colorate.Horizontal(Colors.red_to_white, "Lựa chọn không hợp lệ!"))
+        file_index = int(input(Colorate.Horizontal(Colors.yellow_to_green, "Chọn file chứa tin nhắn (nhập số thứ tự): "))) - 1
+        if file_index < 0 or file_index >= len(txt_files):
+            print(Colorate.Horizontal(Colors.red_to_white, "Số thứ tự không hợp lệ!"))
+            return
+    except ValueError:
+        print(Colorate.Horizontal(Colors.red_to_white, "Vui lòng nhập số hợp lệ!"))
         return
 
-    with open(msg_file, 'r', encoding='utf-8') as f:
-        messages = [line.strip() for line in f if line.strip()]
+    file_path = txt_files[file_index]
+    with open(file_path, 'r', encoding='utf-8') as file:
+        messages = [line.strip() for line in file.readlines() if line.strip()]
 
     if not messages:
         print(Colorate.Horizontal(Colors.red_to_white, "File tin nhắn rỗng!"))
         return
 
-    # Tag (tùy chọn)
+    # Tag người dùng (tùy chọn)
+    tag_choice = input(Colorate.Horizontal(Colors.yellow_to_green, "\nBạn có muốn tag người dùng không? (y/n): ")).strip().lower()
     tags = []
-    if input(Colorate.Horizontal(Colors.yellow_to_green, "\nCó tag người dùng không? (y/n): ")).strip().lower() == 'y':
-        tag_input = input(Colorate.Horizontal(Colors.yellow_to_green, "Nhập ID tag (cách nhau phẩy): "))
-        tags = [t.strip() for t in tag_input.split(',') if t.strip()]
+    if tag_choice == 'y':
+        tag_input = input(Colorate.Horizontal(Colors.yellow_to_green, "Nhập ID người dùng cần tag (cách nhau bởi dấu phẩy): "))
+        tags = [tag.strip() for tag in tag_input.split(',') if tag.strip()]
 
-    # Delay chung (hoặc riêng theo kênh)
-    delay_mode = input(Colorate.Horizontal(Colors.cyan_to_blue, "\nDelay: (1) Chung cho tất cả | (2) Riêng từng kênh [1/2]: ")).strip() or "1"
-
+    # Thu thập delay cho từng token
     tasks = []
-
-    if delay_mode == "2":
-        for channel_id, tokens in tokens_map.items():
-            channel_name, server_name = get_channel_info(tokens[0], channel_id)
-            print(f"\n--- Delay cho kênh {channel_name} ({server_name}) ---")
+    total_tokens = 0
+    for channel_id, tokens in tokens_map.items():
+        channel_name, server_name = get_channel_info(tokens[0], channel_id)  # Lấy tên kênh từ token đầu
+        print(Colorate.Horizontal(Colors.cyan_to_blue, f"\n=== Kênh: {channel_name} | Server: {server_name} ==="))
+        
+        for i, token in enumerate(tokens):
             try:
-                base_delay = float(input(Colorate.Horizontal(Colors.yellow_to_green, "Delay cơ bản (giây, ví dụ 1.0): ")))
-                rand_range = float(input(Colorate.Horizontal(Colors.yellow_to_green, "Random ± (giây, ví dụ 0.4): ")))
-            except:
-                print("Input sai, dùng mặc định 1.0 ± 0.3")
-                base_delay, rand_range = 1.0, 0.3
+                delay_input = input(Colorate.Horizontal(Colors.yellow_to_green, 
+                    f"Delay (giây) cho token {i + 1}/{len(tokens)} (khuyến nghị 0.8-2.0 để tránh ban): "))
+                delay = float(delay_input)
+                if delay < 0.5:
+                    print(Colorate.Horizontal(Colors.red_to_white, "   Delay quá thấp có thể gây rate limit nhanh!"))
+                tasks.append(spam_message(token, channel_id, messages, delay, tags))
+                total_tokens += 1
+            except ValueError:
+                print(Colorate.Horizontal(Colors.red_to_white, "Delay phải là số! Dừng chương trình."))
+                return
 
-            for token in tokens:
-                tasks.append(spam_message(token, channel_id, messages, base_delay, rand_range, tags))
-    else:
-        # Delay chung cho tất cả
-        try:
-            base_delay = float(input(Colorate.Horizontal(Colors.yellow_to_green, "\nDelay cơ bản cho tất cả token (giây, khuyến nghị 0.8-1.5): ")))
-            rand_range = float(input(Colorate.Horizontal(Colors.yellow_to_green, "Random ± (giây, khuyến nghị 0.3-0.5): ")))
-        except:
-            base_delay, rand_range = 1.0, 0.4
-
-        for channel_id, tokens in tokens_map.items():
-            for token in tokens:
-                tasks.append(spam_message(token, channel_id, messages, base_delay, rand_range, tags))
-
-    # Bắt đầu spam
     clear()
     print(Colorate.Horizontal(Colors.green_to_cyan, f"🚀 BẮT ĐẦU SPAM VỚI {total_tokens} TOKEN 🚀"))
-    print(Colorate.Horizontal(Colors.green_to_cyan, f"Delay: {base_delay} ± {rand_range}s | Tin nhắn: NGẪU NHIÊN\n"))
-
+    print(Colorate.Horizontal(Colors.green_to_cyan, "Tin nhắn sẽ được gửi NGẪU NHIÊN và NHANH hơn!\n"))
     await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
